@@ -1,0 +1,57 @@
+# compose version
+version: '1.28'
+services:
+    nginx:
+        build:
+            dockerfile: ./docker/nginx.dockerfile
+            context: .
+        image: greg/nginx
+        container_name: nginx
+        # mapping ports
+        ports:
+            - "80:80"
+            - "443:443"
+        networks: 
+            - prod-network
+        depends_on: 
+            - "mongodb"
+            - "node"
+            - "jdk"
+
+    mongodb:
+        image: mongo
+        container_name: mongodb
+        networks: 
+            - prod-network
+        environment:
+          MONGO_INITDB_ROOT_USERNAME: gestamp
+          MONGO_INITDB_ROOT_PASSWORD: gestamp
+
+    node:
+        image: node
+        container_name: nodeserv
+        command: npm start
+        working_dir: /var/service
+        volumes:
+          - /var/www:/var/www
+        networks: 
+            - prod-network
+        depends_on:
+            - "mongodb"
+    
+    jdk16:
+        image: openjdk:16
+        container_name: javaspring
+        command: java -jar sinotico.jar
+        working_dir: /var/service
+        volumes:
+          - /var/service:/var/service
+        networks: 
+            - prod-network
+        depends_on:
+            - "mongodb"    
+    
+# default network for containers
+networks: 
+    prod-network:
+        driver: bridge
