@@ -1,5 +1,5 @@
 # compose version
-version: '1.28'
+version: '3.3'
 services:
     nginx:
         build:
@@ -16,7 +16,7 @@ services:
         depends_on: 
             - "mongodb"
             - "node"
-            - "jdk"
+            - "jdk16"
 
     mongodb:
         image: mongo
