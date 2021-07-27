@@ -18,9 +18,11 @@ services:
             - "node"
             - "jdk16"
 
-    mongodb:
+      mongodb:
         image: mongo
         container_name: mongodb
+        ports:
+            - "27017:27017"
         networks: 
             - prod-network
         environment:
@@ -30,10 +32,14 @@ services:
     node:
         image: node
         container_name: nodeserv
-        command: npm start
-        working_dir: /var/service
+        command: >
+            sh -c "npm install -g nodemon &&
+                   npm start"
+        working_dir: /var/www
         volumes:
-          - /var/www:/var/www
+            - /var/www:/var/www
+        ports:
+            - "80:3000"
         networks: 
             - prod-network
         depends_on:
@@ -42,10 +48,13 @@ services:
     jdk16:
         image: openjdk:16
         container_name: javaspring
-        command: java -jar sinotico.jar
+        command: >
+            sh -c "java -jar sinotico.jar"
         working_dir: /var/service
         volumes:
-          - /var/service:/var/service
+            - /var/service:/var/service
+        ports:
+            - "8080:8080"
         networks: 
             - prod-network
         depends_on:
